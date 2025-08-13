@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TrendPilot - Advanced AI Trend Intelligence Platform</title>
+    <!-- TikTok Login SDK -->
+    <script src="https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tiktok/webapp/login-sdk/sdk.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -90,6 +93,20 @@
             font-weight: 300;
         }
         
+        .user-info {
+            display: none;
+            background: rgba(0,245,255,0.1);
+            border: 1px solid rgba(0,245,255,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .user-info.show {
+            display: block;
+        }
+        
         .stats-bar {
             display: flex;
             justify-content: center;
@@ -172,35 +189,6 @@
             font-size: 1.1rem;
         }
         
-        .tech-specs {
-            background: rgba(0,0,0,0.4);
-            padding: 50px;
-            border-radius: 20px;
-            margin: 60px 0;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .tech-specs h3 {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 30px;
-            color: #00f5ff;
-        }
-        
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            text-align: center;
-        }
-        
-        .tech-item {
-            padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
         .cta-section {
             text-align: center;
             padding: 80px 0;
@@ -257,6 +245,11 @@
             box-shadow: 0 15px 35px rgba(0,245,255,0.4);
         }
         
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
         .footer {
             text-align: center;
             padding: 50px 0;
@@ -304,6 +297,13 @@
             <div class="logo">⚡ TrendPilot</div>
             <div class="tagline">Advanced AI Trend Intelligence</div>
             <div class="subtitle">Powered by Advance Solutions LLC</div>
+            
+            <!-- User Info Display (Hidden by default) -->
+            <div id="userInfo" class="user-info">
+                <h3>🎉 Welcome to TrendPilot!</h3>
+                <p>Authenticated with TikTok</p>
+                <div id="userDetails"></div>
+            </div>
         </div>
         
         <div class="stats-bar">
@@ -321,6 +321,7 @@
             </div>
         </div>
         
+        <!-- Features section (same as before) -->
         <div class="features">
             <div class="feature">
                 <span class="feature-icon">🔮</span>
@@ -347,36 +348,14 @@
             </div>
         </div>
         
-        <div class="tech-specs">
-            <h3>Technology Stack</h3>
-            <div class="tech-grid">
-                <div class="tech-item">
-                    <strong>AI Models</strong><br>
-                    GPT-4, BERT, Custom ML
-                </div>
-                <div class="tech-item">
-                    <strong>Data Sources</strong><br>
-                    Social APIs, News Feeds, Market Data
-                </div>
-                <div class="tech-item">
-                    <strong>Processing</strong><br>
-                    Real-time ETL, Cloud Computing
-                </div>
-                <div class="tech-item">
-                    <strong>Security</strong><br>
-                    OAuth 2.0, GDPR Compliant
-                </div>
-            </div>
-        </div>
-        
         <div class="cta-section">
             <h2 class="cta-title">Access Advanced Trend Intelligence</h2>
             <p style="color: rgba(255,255,255,0.8); font-size: 1.2rem; margin-bottom: 20px;">
-                Connect your social accounts for personalized AI-powered insights
+                Connect your TikTok account for personalized AI-powered insights
             </p>
             
             <div class="cta-buttons">
-                <button class="btn btn-primary" onclick="alert('TikTok Login Kit integration pending API approval')">
+                <button id="tiktokLoginBtn" class="btn btn-primary" onclick="initTikTokLogin()">
                     🎵 Authenticate with TikTok
                 </button>
                 <button class="btn btn-secondary" onclick="alert('Feature launching soon')">
@@ -397,5 +376,73 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // TikTok Login Configuration
+        const TIKTOK_CLIENT_KEY = 'sbaww6z73gt0rpmfm3'; // Replace with your actual client key
+        
+        function initTikTokLogin() {
+            // Disable button during login process
+            document.getElementById('tiktokLoginBtn').disabled = true;
+            document.getElementById('tiktokLoginBtn').textContent = '🔄 Connecting...';
+            
+            try {
+                // Initialize TikTok Login
+                window.TikTokLogin.init({
+                    client_key: TIKTOK_CLIENT_KEY,
+                    scope: 'user.info.basic',
+                    redirect_uri: 'https://luxlifelogic.github.io/auth/callback',
+                    state: 'trendpilot_auth_' + Date.now()
+                });
+            } catch (error) {
+                console.error('TikTok Login Error:', error);
+                alert('Login temporarily unavailable. Demo shows integration flow.');
+                
+                // Demo mode - show sample user data
+                showUserInfo({
+                    display_name: 'TrendPilot_Demo_User',
+                    avatar_url: 'https://via.placeholder.com/50',
+                    open_id: 'demo_user_123'
+                });
+            }
+        }
+        
+        function showUserInfo(userData) {
+            const userInfo = document.getElementById('userInfo');
+            const userDetails = document.getElementById('userDetails');
+            
+            userDetails.innerHTML = `
+                <p><strong>Display Name:</strong> ${userData.display_name}</p>
+                <p><strong>User ID:</strong> ${userData.open_id}</p>
+                <p>🎯 <em>Your personalized trend insights are now available!</em></p>
+            `;
+            
+            userInfo.classList.add('show');
+            
+            // Update button
+            document.getElementById('tiktokLoginBtn').textContent = '✅ Connected to TikTok';
+            document.getElementById('tiktokLoginBtn').disabled = true;
+        }
+        
+        // Handle OAuth callback (if user returns from TikTok)
+        function handleOAuthCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            
+            if (code && state) {
+                // In a real app, you'd exchange the code for an access token
+                // For demo purposes, show success
+                showUserInfo({
+                    display_name: 'TikTok_User',
+                    avatar_url: 'https://via.placeholder.com/50',
+                    open_id: 'authenticated_user'
+                });
+            }
+        }
+        
+        // Check for OAuth callback on page load
+        document.addEventListener('DOMContentLoaded', handleOAuthCallback);
+    </script>
 </body>
 </html>
